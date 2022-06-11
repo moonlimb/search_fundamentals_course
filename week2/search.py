@@ -108,6 +108,7 @@ def query():
         ##### W2, L1, S2
 
         ##### W2, L2, S2
+        query_obj = qu.add_spelling_suggestions(query_obj, user_query)
         print("Plain ol q: %s" % query_obj)
     elif request.method == 'GET':  # Handle the case where there is no query or just loading the page
         user_query = request.args.get("query", "*")
@@ -123,13 +124,14 @@ def query():
         #### W2, L1, S2
 
         ##### W2, L2, S2
-
+        query_obj = qu.add_spelling_suggestions(query_obj, user_query)
     else:
         query_obj = qu.create_query("*", "", [], sort, sortDir, size=100)
 
-    #print("query obj: {}".format(query_obj))
+    print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index="bbuy_products", explain=explain)
     # Postprocess results here if you so desire
+    # import ipdb; ipdb.set_trace()
 
     #print(response)
     if error is None:

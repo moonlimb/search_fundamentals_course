@@ -250,8 +250,23 @@
           }
         }
       },
+<<<<<<< Updated upstream
       "TODO: REPLACE WITH SUGGEST": {
         "REPLACE": "REPLACE"
+=======
+      "suggest": {
+        "type": "completion",
+        "fields": {
+          "trigrams": {
+            "type": "text",
+            "analyzer": "trigram"
+          },
+          "text": {
+            "type": "text",
+            "analyzer": "english"
+          }
+        }
+>>>>>>> Stashed changes
       },
       "canonical": {
         "type": "text"

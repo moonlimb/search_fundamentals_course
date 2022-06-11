@@ -159,16 +159,27 @@ def create_query(user_query, filters, sort="_score", sortDir="desc", size=10, in
 # Give a user query from the UI and the query object we've built so far, adding in spelling suggestions
 def add_spelling_suggestions(query_obj, user_query):
     #### W2, L2, S1
-    print("TODO: IMPLEMENT ME")
-    #query_obj["suggest"] = {
-    #    "text": user_query,
-    #    "phrase_suggest": {
-
-    #    },
-    #    "term_suggest": {
-
-    #    }
-    #}
+    query_obj["suggest"] = {
+       "text": user_query,
+       "phrase_suggest": {
+            "phrase": {
+                "field": "suggest.trigrams",
+                "direct_generator": [{
+                    "field": "suggest.trigrams",
+                    "suggest_mode": "popular",
+                    "min_word_length": 2
+                }]
+            },
+       },
+       "term_suggest": {
+           "term": {
+                "field": "suggest.text",
+                "suggest_mode": "popular",
+                "min_word_length": 3,
+           },
+       }
+    }
+    return query_obj
 
 
 # Given the user query from the UI, the query object we've built so far and a Pandas data GroupBy data frame,
@@ -180,6 +191,11 @@ def add_click_priors(query_obj, user_query, priors_gb):
         if prior_clicks_for_query is not None and len(prior_clicks_for_query) > 0:
             click_prior = ""
             #### W2, L1, S1
+            # print(f'query obj: {query_obj}')
+            # print(f' user query: {user_query}')
+            # print(f'priors_gb: {priors_gb}')
+            # import ipdb; ipdb.set_trace()
+
             # Create a string object of SKUs and weights that will boost documents matching the SKU
             print("TODO: Implement me")
             if click_prior != "":
