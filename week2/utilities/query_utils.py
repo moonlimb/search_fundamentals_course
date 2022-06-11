@@ -168,7 +168,11 @@ def add_spelling_suggestions(query_obj, user_query):
                     "field": "suggest.trigrams",
                     "suggest_mode": "popular",
                     "min_word_length": 2
-                }]
+                }],
+                "highlight": {
+                    "pre_tag": "<em>",
+                    "post_tag": "</em>"
+                }
             },
        },
        "term_suggest": {
@@ -181,6 +185,19 @@ def add_spelling_suggestions(query_obj, user_query):
     }
     return query_obj
 
+def get_autocomplete_query(prefix):
+    #### W2, L2, S1
+   return {
+       "suggest": {
+            "autocomplete": {
+                "prefix": prefix,
+                "completion": {
+                    "field": "suggest",
+                    "skip_duplicates": True
+                }
+            }
+       } 
+    }
 
 # Given the user query from the UI, the query object we've built so far and a Pandas data GroupBy data frame,
 # construct and add a query that consists of the ids from the items that were clicked on by users for that query
