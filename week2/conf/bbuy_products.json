@@ -250,10 +250,6 @@
           }
         }
       },
-<<<<<<< Updated upstream
-      "TODO: REPLACE WITH SUGGEST": {
-        "REPLACE": "REPLACE"
-=======
       "suggest": {
         "type": "completion",
         "fields": {
@@ -266,7 +262,6 @@
             "analyzer": "english"
           }
         }
->>>>>>> Stashed changes
       },
       "canonical": {
         "type": "text"
