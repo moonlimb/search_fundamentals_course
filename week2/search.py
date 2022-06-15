@@ -57,19 +57,28 @@ def process_filters(filters_input):
 
 @bp.route('/autocomplete', methods=['GET'])
 def autocomplete():
+    opensearch = get_opensearch()
     results = {}
     if request.method == 'GET':  # a query has been submitted
-        prefix = request.args.get("prefix")
-        print(f"Prefix: {prefix}")
+        prefix = request.args.get("prefix")  # not sure what should be default
         if prefix is not None:
-            type = request.args.get("type", "queries") # If type == queries, this is an autocomplete request, else if products, it's an instant search request.
+            type = request.args.get("type", "queries")
             ##### W2, L3, S1
             search_response = None
             print("TODO: implement autocomplete AND instant search")
-            if (search_response and search_response['suggest']['autocomplete'] and search_response['suggest']['autocomplete'][0]['length'] > 0): # just a query response
-                results = search_response['suggest']['autocomplete'][0]['options']
-    print(f"Results: {results}")
+            index_name = 'bbuy_queries' if type == 'queries' else 'bbuy_products'
+            # this is an autocomplete request, 
+            if type == 'queries':
+                query_obj = qu.get_autocomplete_query(prefix=request.args.get('prefix'))
+                search_response = opensearch.search(body=query_obj, index=index_name)
+                if (search_response and search_response['suggest']['autocomplete'] and search_response['suggest']['autocomplete'][0]['length'] > 0): # just a query response
+                    results = search_response['suggest']['autocomplete'][0]['options']
+                    print(f"Results: {results}")
+            else: # if products, it's an instant search request.
+                pass
+                # implement instant search
     return {"completions": results}
+
 
 @bp.route('/query', methods=['GET', 'POST'])
 def query():
@@ -108,6 +117,7 @@ def query():
         ##### W2, L1, S2
 
         ##### W2, L2, S2
+        query_obj = qu.add_spelling_suggestions(query_obj, user_query)
         print("Plain ol q: %s" % query_obj)
     elif request.method == 'GET':  # Handle the case where there is no query or just loading the page
         user_query = request.args.get("query", "*")
@@ -123,15 +133,14 @@ def query():
         #### W2, L1, S2
 
         ##### W2, L2, S2
-
+        query_obj = qu.add_spelling_suggestions(query_obj, user_query)
     else:
         query_obj = qu.create_query("*", "", [], sort, sortDir, size=100)
 
-    #print("query obj: {}".format(query_obj))
+    print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index="bbuy_products", explain=explain)
     # Postprocess results here if you so desire
 
-    #print(response)
     if error is None:
         return render_template("search_results.jinja2", query=user_query, search_response=response,
                                display_filters=display_filters, applied_filters=applied_filters,
